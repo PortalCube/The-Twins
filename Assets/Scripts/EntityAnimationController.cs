@@ -27,6 +27,9 @@ public class EntityAnimationController : MonoBehaviour {
             bool isPingPong = animation.loopType == Tween.LoopType.PingPong;
             float delay = animation.delay - animation.offset;
 
+            // 각 애니메이션의 초기 값으로 지정
+            onValueCallback(animation.startValue);
+
             Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnAnimationComplete(animation, isPingPong));
         }
     }
