@@ -8,12 +8,14 @@ public class EntityController : MonoBehaviour {
 
     int health = 0;
 
-    // Start is called before the first frame update
+    protected virtual void Awake() {
+
+    }
+
     protected virtual void Start() {
         health = maxHealth;
     }
 
-    // Update is called once per frame
     protected virtual void Update() {
 
     }

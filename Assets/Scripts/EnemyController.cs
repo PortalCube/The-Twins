@@ -18,21 +18,19 @@ public class EnemyController : EntityController {
     float fireRate = 0f;
     float time = 0f;
 
-    protected override void Start() {
-        base.Start();
-
+    protected override void Awake() {
+        base.Awake();
         weaponController = GetComponent<WeaponController>();
         animator = GetComponent<Animator>();
+    }
 
+    protected override void Start() {
+        base.Start();
         animator.SetFloat("IdleOffset", Random.Range(0f, 0.5f));
 
         hitboxTransform = transform.Find("Hitbox").transform;
 
         SetFireRate();
-
-        if (gameObject.activeSelf) {
-            OnSpawn();
-        }
 
         if (weaponController) {
             weaponController.isEnemyWeapon = true;
@@ -56,15 +54,15 @@ public class EnemyController : EntityController {
     }
 
     protected override void OnEnable() {
-        OnSpawn();
-    }
+        base.OnEnable();
 
-    void OnSpawn() {
         animator.SetTrigger("Spawn");
 
         // trackPlayerPosition이 활성화 된 경우, parent를 player로 설정
         if (trackPlayerPosition) {
-            transform.SetParent(GameManager.instance.player.transform);
+            // GameManager.instance가 초기화 되지 않은 상태에서 이 코드가 실행되는 경우가 있어서, 임시방편으로 GameObject.Find("Player")로 수정
+            // transform.SetParent(GameManager.instance.player.transform);
+            transform.SetParent(GameObject.Find("Player").transform);
         }
     }
 
