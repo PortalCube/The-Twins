@@ -18,6 +18,10 @@ public class EntityController : MonoBehaviour {
 
     }
 
+    protected virtual void OnEnable() {
+
+    }
+
     public virtual void Hit(int Damage) {
         health -= Damage;
 

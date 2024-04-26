@@ -7,7 +7,7 @@ using UnityEditor;
 public class LaserSpawnerEditor : Editor {
 
     public override void OnInspectorGUI() {
-        DrawDefaultInspector();
+        base.OnInspectorGUI();
 
         LaserSpawner laserSpawner = (LaserSpawner)target;
 
