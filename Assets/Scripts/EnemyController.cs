@@ -28,6 +28,10 @@ public class EnemyController : EntityController {
         base.Start();
         animator.SetFloat("IdleOffset", Random.Range(0f, 0.5f));
 
+        // 엔티티 애니메이터 시작
+        GetComponent<EntityAnimationController>().StartAwakeAnimation();
+        EnemyEnable();
+
         hitboxTransform = transform.Find("Hitbox").transform;
 
         SetFireRate();
@@ -53,9 +57,7 @@ public class EnemyController : EntityController {
         CheckFire();
     }
 
-    protected override void OnEnable() {
-        base.OnEnable();
-
+    public void EnemyEnable() {
         animator.SetTrigger("Spawn");
 
         // trackPlayerPosition이 활성화 된 경우, parent를 player로 설정

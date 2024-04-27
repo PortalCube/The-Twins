@@ -6,11 +6,11 @@ using UnityEngine;
 
 public class EntityAnimationController : MonoBehaviour {
 
-    public EntityAnimation[] animations;
+    public List<EntityAnimation> awakeAnimations;
+    public EntityAnimation[] mainAnimations;
 
     // Start is called before the first frame update
     void Start() {
-        StartAnimation();
     }
 
     // Update is called once per frame
@@ -18,19 +18,39 @@ public class EntityAnimationController : MonoBehaviour {
 
     }
 
-    // Entity 애니메이션 시작
-    public void StartAnimation() {
-        foreach (var animation in animations) {
+    // Awake 애니메이션 시작
+    public void StartAwakeAnimation() {
+        if (awakeAnimations == null || awakeAnimations.Count == 0) {
+            // Awake 애니메이션이 없는 경우, Main 애니메이션 시작
+            StartMainAnimation();
+            return;
+        }
+
+        foreach (var animation in awakeAnimations) {
+            Action<float> onValueCallback = GetValueCallback(animation);
+
+            // Awake 애니메이션에서, loopType은 None으로 고정
+
+            // transform을 각 애니메이션의 초기 값으로 지정
+            onValueCallback(animation.startValue);
+
+            Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, animation.delay, animation.curve, Tween.LoopType.None, null, () => OnAwakeAnimationComplete(animation));
+        }
+    }
+
+    // Main 애니메이션 시작
+    public void StartMainAnimation() {
+        foreach (var animation in mainAnimations) {
             Action<float> onValueCallback = GetValueCallback(animation);
 
             // PingPong 루프의 경우, Ping 부분만 재생
             bool isPingPong = animation.loopType == Tween.LoopType.PingPong;
             float delay = animation.delay - animation.offset;
 
-            // 각 애니메이션의 초기 값으로 지정
+            // transform을 각 애니메이션의 초기 값으로 지정
             onValueCallback(animation.startValue);
 
-            Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnAnimationComplete(animation, isPingPong));
+            Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPingPong));
         }
     }
 
@@ -43,7 +63,8 @@ public class EntityAnimationController : MonoBehaviour {
                     transform.localPosition = GetValueVector(animation.axis, transform.localPosition, value);
                     break;
                 case EntityAnimation.AnimationType.Rotate:
-                    transform.localRotation = Quaternion.Euler(GetValueVector(animation.axis, transform.localRotation.eulerAngles, value));
+                    Quaternion rotation = Quaternion.Euler(GetValueVector(animation.axis, transform.localRotation.eulerAngles, value));
+                    transform.localRotation = rotation;
                     break;
             }
         };
@@ -60,8 +81,30 @@ public class EntityAnimationController : MonoBehaviour {
         };
     }
 
-    // Tween 애니메이션이 종료될 때마다 실행
-    void OnAnimationComplete(EntityAnimation animation, bool isPingEnded = false) {
+    // type과 axis에 따라서 현재 transform의 값을 반환하는 함수
+    float GetCurrentValue(EntityAnimation animation) {
+        // C# 8.0, Switch expression
+        return animation.type switch {
+            EntityAnimation.AnimationType.Translate => transform.localPosition[(int)animation.axis],
+            EntityAnimation.AnimationType.Rotate => transform.localRotation.eulerAngles[(int)animation.axis],
+            _ => 0f,
+        };
+    }
+
+
+    // Awake 애니메이션이 종료될 때마다 실행
+    void OnAwakeAnimationComplete(EntityAnimation animation) {
+        awakeAnimations.Remove(animation);
+
+        // 모든 Awake 애니메이션 종료
+        if (awakeAnimations.Count == 0) {
+            // Main 애니메이션 시작
+            StartMainAnimation();
+        }
+    }
+
+    // Main 애니메이션이 종료될 때마다 실행
+    void OnMainAnimationComplete(EntityAnimation animation, bool isPingEnded = false) {
         float start = animation.startValue;
         float end = animation.endValue;
         float delay = animation.delay;
@@ -86,6 +129,6 @@ public class EntityAnimationController : MonoBehaviour {
         }
 
         // Loop 혹은 PingPong 루프 애니메이션 진행
-        Tween.Value(start, end, GetValueCallback(animation), animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnAnimationComplete(animation, isPing));
+        Tween.Value(start, end, GetValueCallback(animation), animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPing));
     }
 }
