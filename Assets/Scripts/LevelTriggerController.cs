@@ -6,23 +6,48 @@ public class LevelTriggerController : MonoBehaviour {
 
     public GameObject[] linkedObjects;
 
-    // Start is called before the first frame update
-    void Start() {
+    void Awake() {
         foreach (GameObject linkedObject in linkedObjects) {
+            if (linkedObject == null) {
+                Debug.LogError("Linked Object is null");
+                continue;
+            }
+
             linkedObject.SetActive(false);
         }
     }
 
-    // Update is called once per frame
+    void Start() {
+
+    }
+
     void Update() {
 
     }
 
     void OnTriggerEnter(Collider other) {
         if (other.tag == "Player") {
+            // Trigger를 Player의 위치로 이동
+            // Trigger의 자식 Entity들이 활성화 된 후 Player의 자식이 되었을 때, Player가 트리거를 어느 위치에서 충돌하던 동일한 위치로 이동하기 위함
+            Debug.Log(transform.position);
+            Debug.Log(other.transform.position);
+            transform.position = other.transform.position;
+
             foreach (GameObject linkedObject in linkedObjects) {
+                if (linkedObject == null) {
+                    Debug.LogError("Linked Object is null");
+                    continue;
+                }
+
                 linkedObject.SetActive(true);
+
+                EnemyController enemyController = linkedObject.GetComponent<EnemyController>();
+                if (enemyController) {
+                    enemyController.EnemyEnable();
+                }
             }
+
+            Destroy(gameObject);
         }
     }
 
