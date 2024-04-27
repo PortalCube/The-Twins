@@ -30,7 +30,7 @@ public class PlayerControllerEditor : Editor {
             }
 
             Handles.color = Color.white;
-            Handles.Label(waypoint.position + Vector3.up * 0.5f, string.Format("Waypoint {0}\n{1}\n{2}, {3}", i + 1, waypoint.position, waypoint.speed, waypoint.isEaseing));
+            Handles.Label(waypoint.position + Vector3.up * 0.5f, string.Format("Waypoint {0}\n{1}\nSpeed: {2}", i + 1, waypoint.position, waypoint.speed));
 
             EditorGUI.BeginChangeCheck();
             Vector3 newPosition = Handles.PositionHandle(waypoint.position, waypoint.direction);

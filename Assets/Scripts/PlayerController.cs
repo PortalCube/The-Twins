@@ -9,7 +9,6 @@ public class Waypoint {
     public Vector3 position;
     public Quaternion direction = Quaternion.identity;
     public float speed = 1f;
-    public bool isEaseing = false;
 }
 
 public class PlayerController : MonoBehaviour {
@@ -45,8 +44,8 @@ public class PlayerController : MonoBehaviour {
         float distance = Vector3.Distance(transform.position, waypoints[index].position);
         float duration = distance / waypoints[index].speed;
 
-        AnimationCurve curve = waypoints[index].isEaseing ? Tween.EaseInOut : Tween.EaseLinear;
-        Tween.Position(transform, waypoints[index].position, duration, 0f, curve, Tween.LoopType.None, null, () => Move(index + 1));
+        Tween.Position(transform, waypoints[index].position, duration, 0f, Tween.EaseLinear, Tween.LoopType.None, null, () => Move(index + 1));
         Tween.Rotation(transform, waypoints[index].direction, rotateDuration, 0f, Tween.EaseOut);
+
     }
 }
