@@ -1,4 +1,5 @@
 using Pixelplacement;
+using Pixelplacement.TweenSystem;
 using UnityEngine;
 
 [System.Serializable]
@@ -30,4 +31,6 @@ public class EntityAnimation {
     public float pingPongDelay = 0f; // PingPong에서, Ping과 Pong 사이의 대기 시간
     public float delay = 0f; // Loop 혹은 PingPong에서, cycle과 cycle 사이의 대기 시간
     public float offset = 0f; // 첫 시작시 애니메이션 진행률, 0 ~ 1
+
+    public TweenBase tween;
 }

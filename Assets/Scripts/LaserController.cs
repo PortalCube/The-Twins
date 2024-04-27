@@ -5,9 +5,10 @@ using VolumetricLines;
 
 public class LaserController : MonoBehaviour {
 
-    VolumetricLineBehavior lineController;
-
     public float maxDistance = 100.0f;
+    public GameObject sparkEffect;
+
+    VolumetricLineBehavior lineController;
 
     // Start is called before the first frame update
     void Start() {
@@ -18,14 +19,23 @@ public class LaserController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         RaycastHit hit;
-
         lineController.EndPos = Vector3.forward;
         if (Physics.Raycast(transform.position, transform.forward, out hit, maxDistance, LayerMask.GetMask("Level"))) {
+            // 벽에 맞음
             lineController.EndPos *= hit.distance;
+
+            // sparkEffect의 위치를 충돌 지점으로, 방향을 충돌 지점의 법선 벡터로 설정
+            sparkEffect.transform.position = hit.point;
+            sparkEffect.transform.rotation = Quaternion.LookRotation(hit.normal);
+
+            // sparkEffect 활성화
+            sparkEffect.SetActive(true);
+
         } else {
             lineController.EndPos *= maxDistance;
-        }
 
-        // TODO: EndPos에 레이저 부딫히는 파티클 추가
+            // sparkEffect 비활성화
+            sparkEffect.SetActive(false);
+        }
     }
 }

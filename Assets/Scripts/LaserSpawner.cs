@@ -23,15 +23,25 @@ public class LaserSpawner : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
 
-        // 모든 레이저 오브젝트에 대해서
-        for (int i = 0; i < 6; i++) {
-            // index를 LaserDirection의 flag로 변환
-            LaserDirection flag = (LaserDirection)(1 << i);
-            GameObject laser = laserObjects[i];
+        // // 모든 레이저 오브젝트에 대해서
+        // for (int i = 0; i < 6; i++) {
+        //     // index를 LaserDirection의 flag로 변환
+        //     LaserDirection flag = (LaserDirection)(1 << i);
+        //     GameObject laser = laserObjects[i];
 
-            // direction에 flag가 포함되어 있다면 레이저를 활성화
-            bool active = direction.HasFlag(flag);
-            laser.SetActive(active);
+        //     // direction에 flag가 포함되어 있다면 레이저를 활성화
+        //     bool active = direction.HasFlag(flag);
+        //     laser.SetActive(active);
+        // }
+
+        EnemyController enemyController = GetComponent<EnemyController>();
+
+        if (enemyController == null) {
+            EntityAnimationController entityAnimationController = GetComponent<EntityAnimationController>();
+
+            if (entityAnimationController) {
+                entityAnimationController.StartAwakeAnimation();
+            }
         }
     }
 

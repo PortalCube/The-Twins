@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour {
     public GameObject player;
     public GameObject leftSpaceship;
     public GameObject rightSpaceship;
+    public GameObject fusionSpaceship;
+    public GameObject leftController;
+    public GameObject rightController;
 
     // Singleton 초기화
     void Awake() {

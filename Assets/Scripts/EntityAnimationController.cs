@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Pixelplacement;
+using Pixelplacement.TweenSystem;
 using UnityEngine;
 
 public class EntityAnimationController : MonoBehaviour {
@@ -34,7 +35,7 @@ public class EntityAnimationController : MonoBehaviour {
             // transform을 각 애니메이션의 초기 값으로 지정
             onValueCallback(animation.startValue);
 
-            Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, animation.delay, animation.curve, Tween.LoopType.None, null, () => OnAwakeAnimationComplete(animation));
+            animation.tween = Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, animation.delay, animation.curve, Tween.LoopType.None, null, () => OnAwakeAnimationComplete(animation));
         }
     }
 
@@ -50,7 +51,17 @@ public class EntityAnimationController : MonoBehaviour {
             // transform을 각 애니메이션의 초기 값으로 지정
             onValueCallback(animation.startValue);
 
-            Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPingPong));
+            animation.tween = Tween.Value(animation.startValue, animation.endValue, onValueCallback, animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPingPong));
+        }
+    }
+
+    public void StopAnimation() {
+        foreach (var animation in awakeAnimations) {
+            animation.tween?.Stop();
+        }
+
+        foreach (var animation in mainAnimations) {
+            animation.tween?.Stop();
         }
     }
 
@@ -80,17 +91,6 @@ public class EntityAnimationController : MonoBehaviour {
             _ => original,
         };
     }
-
-    // type과 axis에 따라서 현재 transform의 값을 반환하는 함수
-    float GetCurrentValue(EntityAnimation animation) {
-        // C# 8.0, Switch expression
-        return animation.type switch {
-            EntityAnimation.AnimationType.Translate => transform.localPosition[(int)animation.axis],
-            EntityAnimation.AnimationType.Rotate => transform.localRotation.eulerAngles[(int)animation.axis],
-            _ => 0f,
-        };
-    }
-
 
     // Awake 애니메이션이 종료될 때마다 실행
     void OnAwakeAnimationComplete(EntityAnimation animation) {
@@ -129,6 +129,6 @@ public class EntityAnimationController : MonoBehaviour {
         }
 
         // Loop 혹은 PingPong 루프 애니메이션 진행
-        Tween.Value(start, end, GetValueCallback(animation), animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPing));
+        animation.tween = Tween.Value(start, end, GetValueCallback(animation), animation.duration, delay, animation.curve, Tween.LoopType.None, null, () => OnMainAnimationComplete(animation, isPing));
     }
 }

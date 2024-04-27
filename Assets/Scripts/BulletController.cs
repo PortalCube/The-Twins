@@ -29,8 +29,8 @@ public class BulletController : MonoBehaviour {
 
     // 총알이 충돌했을 때
     void OnTriggerEnter(Collider other) {
-        // 총알에 총알이 맞았을 때
-        if (other.CompareTag("Bullet")) {
+        // 총알에 총알이 맞았거나, Trigger에 맞은 경우
+        if (other.CompareTag("Bullet") || other.CompareTag("Trigger")) {
             // 무시
             return;
         }
@@ -42,7 +42,7 @@ public class BulletController : MonoBehaviour {
                 return;
             } else {
                 // 적의 EnemyController에서 Hit() 함수를 호출
-                EnemyController controller = other.gameObject.GetComponent<EnemyController>();
+                EnemyController controller = other.gameObject.GetComponentInParent<EnemyController>();
                 controller.Hit(damage);
             }
         }
