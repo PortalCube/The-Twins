@@ -8,7 +8,16 @@ public class SpaceshipFusionController : EntityController {
     public WeaponController mainWeaponController;
     public WeaponController chargeWeaponController;
 
-    // Start is called before the first frame update
+    public GameObject fusionEffect;
+    public GameObject hitEffect;
+
+    public GameObject modelObject;
+
+    public float invincibleTime = 1f;
+    public float blinkInterval = 0.1f;
+    bool isInvincible = false;
+    float invincibleTimer = 0f;
+
     protected override void Start() {
         base.Start();
 
@@ -19,13 +28,44 @@ public class SpaceshipFusionController : EntityController {
         weaponController.isEnemyWeapon = false;
     }
 
-    // Update is called once per frame
     protected override void Update() {
         base.Update();
 
         if (OVRInput.Get(fireButton)) {
             Fire();
         }
+
+        if (invincibleTimer > 0) {
+            invincibleTimer -= Time.deltaTime;
+
+            // blinkInterval마다 모델을 껐다 켰다 하도록 설정
+            int blinkCount = (int)(invincibleTimer / blinkInterval);
+            modelObject.SetActive(blinkCount % 2 == 0);
+
+            if (invincibleTimer <= 0) {
+                // 무적 종료
+                SetInvincible(false);
+            }
+        }
+    }
+
+    protected override void OnEnable() {
+        base.OnEnable();
+
+        // 무적 상태 초기화
+        SetInvincible(false);
+
+        Transform playerTransform = GameManager.instance.player.transform;
+
+        Instantiate(fusionEffect, transform.position, transform.rotation, playerTransform);
+    }
+
+    protected override void OnDisable() {
+        base.OnDisable();
+
+        Transform playerTransform = GameManager.instance.player.transform;
+
+        Instantiate(fusionEffect, transform.position, transform.rotation, playerTransform);
     }
 
     public override void Heal(int health) {
@@ -42,6 +82,12 @@ public class SpaceshipFusionController : EntityController {
 
         leftSpaceship.Hit(damage);
         rightSpaceship.Hit(damage);
+
+        // 공격을 맞고도 둘 다 살아 있다면
+        if (!leftSpaceship.IsDead && !rightSpaceship.IsDead) {
+            // 무적 발동
+            SetInvincible(true);
+        }
     }
 
     public override void Die() {
@@ -55,7 +101,22 @@ public class SpaceshipFusionController : EntityController {
         rightSpaceship.Die();
     }
 
+    void SetInvincible(bool value) {
+        isInvincible = value;
+        if (isInvincible) {
+            invincibleTimer = invincibleTime;
+        } else {
+            invincibleTimer = 0;
+            modelObject.SetActive(true);
+        }
+    }
+
     void OnTriggerEnter(Collider other) {
+        // 무적 상태면 무시
+        if (isInvincible) {
+            return;
+        }
+
         if (other.CompareTag("Enemy") || other.CompareTag("Bullet") || other.CompareTag("Level")) {
             // 적, 총알, 레벨 물체와 충돌하면 대미지를 입음
             Hit(1);

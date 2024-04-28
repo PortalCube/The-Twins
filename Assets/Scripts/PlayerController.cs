@@ -103,6 +103,7 @@ public class PlayerController : MonoBehaviour {
         isFusionMode = value;
 
         if (value) {
+            MoveFusionSpaceship();
             leftSpaceship.SetActive(false);
             rightSpaceship.SetActive(false);
             fusionSpaceship.SetActive(true);
