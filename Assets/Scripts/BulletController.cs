@@ -47,17 +47,20 @@ public class BulletController : MonoBehaviour {
             }
         }
 
-        // 플레이어에 총알이 맞았을 때
-        if (other.CompareTag("Spaceship")) {
-            if (isEnemyBullet == false) {
-                // 플레이어의 총알이 플레이어에게 충돌한 경우, 무시
-                return;
-            } else {
-                // 플레이어의 SpaceshipController에서 Hit() 함수를 호출
-                SpaceshipController controller = other.gameObject.GetComponent<SpaceshipController>();
-                controller.Hit(damage);
-            }
-        }
+
+        // 플레이어의 Hit 로직은 플레이어에 작성
+
+        // // 플레이어에 총알이 맞았을 때
+        // if (other.CompareTag("Spaceship")) {
+        //     if (isEnemyBullet == false) {
+        //         // 플레이어의 총알이 플레이어에게 충돌한 경우, 무시
+        //         return;
+        //     } else {
+        //         // 플레이어의 SpaceshipController에서 Hit() 함수를 호출
+        //         SpaceshipController controller = other.gameObject.GetComponent<SpaceshipController>();
+        //         controller.Hit(damage);
+        //     }
+        // }
 
         // Bullet 게임 오브젝트 제거
         DestroySelf();

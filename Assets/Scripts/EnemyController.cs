@@ -14,6 +14,7 @@ public class EnemyController : EntityController {
     public float maxFireRate = 1.2f;
 
     public GameObject fireEffect;
+    public GameObject destroyEffect;
 
     Transform hitboxTransform;
     Animator animator;
@@ -62,7 +63,8 @@ public class EnemyController : EntityController {
                 hitboxTransform.LookAt(target.transform);
             } else {
                 // Spaceship이 존재하지 않는 경우, 정면을 바라보도록 설정
-                hitboxTransform.LookAt(hitboxTransform.transform.forward);
+                GameObject player = GameManager.instance.player;
+                hitboxTransform.LookAt(player.transform.forward * -1);
             }
         }
 
@@ -83,8 +85,11 @@ public class EnemyController : EntityController {
     // Destroy(gameObject) 대신 Destroy 애니메이션을 실행
     public override void Die() {
         // Destroy 애니메이션 실행
+        IsDead = true;
         animator.SetTrigger("Destroy");
         entityAnimationController.StopAnimation();
+        Transform playerTransform = GameManager.instance.player.transform;
+        Instantiate(destroyEffect, hitboxTransform.position, hitboxTransform.rotation, playerTransform);
     }
 
     // Die() 함수는 Animation Event로 실행

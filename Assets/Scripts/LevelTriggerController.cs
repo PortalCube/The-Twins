@@ -29,8 +29,6 @@ public class LevelTriggerController : MonoBehaviour {
         if (other.tag == "Player") {
             // Trigger를 Player의 위치로 이동
             // Trigger의 자식 Entity들이 활성화 된 후 Player의 자식이 되었을 때, Player가 트리거를 어느 위치에서 충돌하던 동일한 위치로 이동하기 위함
-            Debug.Log(transform.position);
-            Debug.Log(other.transform.position);
             transform.position = other.transform.position;
 
             foreach (GameObject linkedObject in linkedObjects) {

@@ -25,20 +25,32 @@ public class EntityController : MonoBehaviour {
 
     }
 
-    public virtual void Hit(int Damage) {
+    protected virtual void OnDisable() {
+
+    }
+
+    public virtual void Heal(int health) {
+        Health += health;
+
+        if (Health > maxHealth) {
+            Health = maxHealth;
+        }
+    }
+
+    public virtual void Hit(int damage) {
         if (IsDead) {
             return;
         }
 
-        Health -= Damage;
+        Health -= damage;
 
         if (Health <= 0) {
-            IsDead = true;
             Die();
         }
     }
 
     public virtual void Die() {
+        IsDead = true;
         Destroy(gameObject);
     }
 

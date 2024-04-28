@@ -12,6 +12,10 @@ public class EntityAnimationController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+        // 따로 제어하는 EntityController가 없는 경우, 바로 Awake 애니메이션 시작
+        if (GetComponent<EntityController>() == null) {
+            StartAwakeAnimation();
+        }
     }
 
     // Update is called once per frame

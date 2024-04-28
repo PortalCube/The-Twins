@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ParticleController : MonoBehaviour {
@@ -8,7 +9,7 @@ public class ParticleController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        particles = GetComponentsInChildren<ParticleSystem>();
+        particles = GetComponentsInChildren<ParticleSystem>().Concat(GetComponents<ParticleSystem>()).ToArray();
     }
 
     // Update is called once per frame

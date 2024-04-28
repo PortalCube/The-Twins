@@ -208,6 +208,7 @@ MonoBehaviour:
   minFireRate: -1
   maxFireRate: -1
   fireEffect: {fileID: 0}
+  destroyEffect: {fileID: 358637981425055526, guid: 751dc36485d824c4990f0559e282d4ca, type: 3}
 --- !u!114 &6073506713445402297
 MonoBehaviour:
   m_ObjectHideFlags: 0

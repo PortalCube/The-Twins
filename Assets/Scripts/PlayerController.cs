@@ -16,10 +16,19 @@ public class PlayerController : MonoBehaviour {
 
     public float rotateDuration = 1.5f;
 
+    // Fusion Mode
     public bool isFusionMode = false;
-
     public float activeFusionDistance = 0.2f;
     public float deactiveFusionDistance = 0.3f;
+
+    // Charge Mode
+    public bool isChargeMode = false;
+    public OVRInput.Button chargeButton = OVRInput.Button.One;
+    public float chargeTime = 4f;
+    public int energy = 0;
+    public int maxEnergy = 1000;
+
+    float chargeTimer = 0f;
 
     // Start is called before the first frame update
     void Start() {
@@ -28,9 +37,25 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        // Fusion Mode 로직
         if (CheckFusionMode()) {
             MoveFusionSpaceship();
         }
+
+        // 차지 버튼을 누르면 에너지 사용
+        if (OVRInput.GetDown(chargeButton)) {
+            UseEnergy();
+        }
+
+        // Charge Mode 로직
+        if (isChargeMode) {
+            chargeTimer -= Time.deltaTime;
+
+            if (chargeTimer <= 0) {
+                SetChargeActive(false);
+            }
+        }
+
     }
 
     void MoveFusionSpaceship() {
@@ -38,10 +63,11 @@ public class PlayerController : MonoBehaviour {
         GameObject leftController = GameManager.instance.leftController;
         GameObject rightController = GameManager.instance.rightController;
 
+        // 두 컨트롤러의 position의 중간 지점으로 적용
         Vector3 position = (leftController.transform.position + rightController.transform.position) / 2;
         fusionSpaceship.transform.position = position;
 
-
+        // 두 컨트롤러의 rotation의 중간 지점으로 적용
         fusionSpaceship.transform.rotation = Quaternion.Slerp(leftController.transform.rotation, rightController.transform.rotation, 0.5f);
     }
 
@@ -58,11 +84,12 @@ public class PlayerController : MonoBehaviour {
 
         if (isFusionMode) {
             if (distance > deactiveFusionDistance || bothAlive == false) {
+                // 컨트롤러가 비활성화 거리에 도달하거나, 둘 중 하나라도 죽은 경우
                 UpdateFusionMode(false);
             }
         } else if (distance < activeFusionDistance && bothAlive) {
+            // 컨트롤러가 활성화 거리에 도달했고, 둘 다 살아있는 경우
             UpdateFusionMode(true);
-
         }
 
         return isFusionMode;
@@ -106,6 +133,46 @@ public class PlayerController : MonoBehaviour {
 
         Tween.Position(transform, waypoints[index].position, duration, 0f, Tween.EaseLinear, Tween.LoopType.None, null, () => Move(index + 1));
         Tween.Rotation(transform, waypoints[index].direction, rotateDuration, 0f, Tween.EaseOut);
+    }
 
+    public void ChargeEnergy(int value) {
+        energy += value;
+
+        if (energy > maxEnergy) {
+            energy = maxEnergy;
+        }
+    }
+
+    public bool UseEnergy() {
+        if (energy >= maxEnergy) {
+            energy = 0;
+
+            // Charge Mode 활성화
+            SetChargeActive(true);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void SetChargeActive(bool value) {
+        isChargeMode = value;
+
+        // ship의 weapon을 chargeWeapon으로 변경
+        SpaceshipController leftSpaceship = GameManager.instance.leftSpaceship.GetComponent<SpaceshipController>();
+        SpaceshipController rightSpaceship = GameManager.instance.rightSpaceship.GetComponent<SpaceshipController>();
+        SpaceshipFusionController fusionSpaceship = GameManager.instance.fusionSpaceship.GetComponent<SpaceshipFusionController>();
+
+        if (value) {
+            chargeTimer = chargeTime;
+
+            leftSpaceship.weaponController = leftSpaceship.chargeWeaponController;
+            rightSpaceship.weaponController = rightSpaceship.chargeWeaponController;
+            fusionSpaceship.weaponController = fusionSpaceship.chargeWeaponController;
+        } else {
+            leftSpaceship.weaponController = leftSpaceship.mainWeaponController;
+            rightSpaceship.weaponController = rightSpaceship.mainWeaponController;
+            fusionSpaceship.weaponController = fusionSpaceship.mainWeaponController;
+        }
     }
 }
