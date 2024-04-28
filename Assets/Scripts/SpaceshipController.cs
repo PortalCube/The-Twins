@@ -72,7 +72,6 @@ public class SpaceshipController : EntityController {
 
         // 무적 발동
         SetInvincible(true);
-
         Instantiate(hitEffect, transform.position, transform.rotation, transform.parent);
     }
 
@@ -81,6 +80,15 @@ public class SpaceshipController : EntityController {
         IsDead = true;
         Transform playerTransform = GameManager.instance.player.transform;
         Instantiate(destroyEffect, transform.position, transform.rotation, playerTransform);
+
+        SpaceshipController left = GameManager.instance.leftSpaceship.GetComponent<SpaceshipController>();
+        SpaceshipController right = GameManager.instance.rightSpaceship.GetComponent<SpaceshipController>();
+
+        if (left.IsDead && right.IsDead) {
+            // 양쪽 모두 사망한 경우, 게임 오버
+            GameManager.instance.GameOver();
+        }
+
         gameObject.SetActive(false);
     }
 
@@ -101,9 +109,16 @@ public class SpaceshipController : EntityController {
             return;
         }
 
-        if (other.CompareTag("Enemy") || other.CompareTag("Bullet") || other.CompareTag("Level")) {
-            // 적, 총알, 레벨 물체와 충돌하면 대미지를 입음
+        if (other.CompareTag("Enemy") || other.CompareTag("Level")) {
+            // 적, 레벨 물체와 충돌하면 대미지를 입음
             Hit(1);
+        } else if (other.CompareTag("Bullet")) {
+            BulletController bulletController = other.GetComponent<BulletController>();
+            if (bulletController.isEnemyBullet) {
+                // 적이 발사한 총알에 충돌하면 대미지를 입음
+                Hit(1);
+            }
         }
+
     }
 }

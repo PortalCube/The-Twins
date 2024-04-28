@@ -18,12 +18,17 @@ public class BulletController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (GameManager.instance.IsGameOver) {
+            // 게임 오버 - 총알 제거
+            Destroy(gameObject);
+        }
+
         time += Time.deltaTime;
 
         transform.position += transform.forward * speed * Time.deltaTime;
 
         if (time > lifeTime) {
-            DestroySelf();
+            Destroy(gameObject);
         }
     }
 
@@ -47,27 +52,14 @@ public class BulletController : MonoBehaviour {
             }
         }
 
+        if (other.CompareTag("Player") && isEnemyBullet == false) {
+            // 플레이어의 총알이 플레이어에게 충돌한 경우, 무시
+            return;
+        }
 
-        // 플레이어의 Hit 로직은 플레이어에 작성
-
-        // // 플레이어에 총알이 맞았을 때
-        // if (other.CompareTag("Spaceship")) {
-        //     if (isEnemyBullet == false) {
-        //         // 플레이어의 총알이 플레이어에게 충돌한 경우, 무시
-        //         return;
-        //     } else {
-        //         // 플레이어의 SpaceshipController에서 Hit() 함수를 호출
-        //         SpaceshipController controller = other.gameObject.GetComponent<SpaceshipController>();
-        //         controller.Hit(damage);
-        //     }
-        // }
+        // 적의 총알이 맞는 경우는, spaceshipcontroller에서 처리
 
         // Bullet 게임 오브젝트 제거
-        DestroySelf();
-    }
-
-    void DestroySelf() {
-        // TODO: 폭발 효과 추가
         Destroy(gameObject);
     }
 }

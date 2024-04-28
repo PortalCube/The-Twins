@@ -13,12 +13,17 @@ public class EnemyController : EntityController {
     public float minFireRate = 0.8f;
     public float maxFireRate = 1.2f;
 
+    public int minEnergy = 15;
+    public int maxEnergy = 30;
+
     public GameObject fireEffect;
     public GameObject destroyEffect;
 
     Transform hitboxTransform;
     Animator animator;
     EntityAnimationController entityAnimationController;
+
+    Quaternion lastRotation;
 
     float fireRate = 0f;
     float time = 0f;
@@ -27,6 +32,8 @@ public class EnemyController : EntityController {
         base.Awake();
         weaponController = GetComponent<WeaponController>();
         animator = GetComponent<Animator>();
+
+        lastRotation = transform.localRotation;
     }
 
     protected override void Start() {
@@ -54,21 +61,31 @@ public class EnemyController : EntityController {
 
         base.Update();
 
+        UpdateHitboxRotation();
+
         // trackPlayerRotation이 활성화 된 경우, hitboxTransform은 계속해서 target 방향으로 rotation 하도록 설정
         if (trackPlayerRotation) {
             GameObject target = FindNearstSpaceship();
 
             // Spaceship이 존재하는 경우, Spaceship을 바라보도록 설정
             if (target) {
-                hitboxTransform.LookAt(target.transform);
+                // target.transform을 smooth하게 바라보도록 지정
+                Quaternion targetRotation = Quaternion.LookRotation(target.transform.position - hitboxTransform.position);
+                hitboxTransform.rotation = Quaternion.Slerp(hitboxTransform.rotation, targetRotation, Time.deltaTime * 4f);
             } else {
-                // Spaceship이 존재하지 않는 경우, 정면을 바라보도록 설정
+                // Spaceship이 존재하지 않는 경우, 플레이어 오브젝트를 바라보도록 설정
                 GameObject player = GameManager.instance.player;
-                hitboxTransform.LookAt(player.transform.forward * -1);
+                hitboxTransform.LookAt(player.transform);
             }
         }
 
         CheckFire();
+    }
+
+    // hitboxTransform의 rotation이 Enemy transform의 회전에 영향을 받지 않도록 함
+    void UpdateHitboxRotation() {
+        hitboxTransform.localRotation = Quaternion.Inverse(transform.localRotation) * lastRotation * hitboxTransform.localRotation;
+        lastRotation = transform.localRotation;
     }
 
     public void EnemyEnable() {
@@ -88,6 +105,12 @@ public class EnemyController : EntityController {
         IsDead = true;
         animator.SetTrigger("Destroy");
         entityAnimationController.StopAnimation();
+
+        // energy를 랜덤하게 추가
+        PlayerController playerController = GameManager.instance.player.GetComponent<PlayerController>();
+        playerController.ChargeEnergy(Random.Range(minEnergy, maxEnergy));
+
+        // 파괴 이펙트 생성
         Transform playerTransform = GameManager.instance.player.transform;
         Instantiate(destroyEffect, hitboxTransform.position, hitboxTransform.rotation, playerTransform);
     }

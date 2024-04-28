@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour {
     public int energy = 0;
     public int maxEnergy = 1000;
 
-    float chargeTimer = 0f;
+    public float chargeTimer = 0f;
 
     // Start is called before the first frame update
     void Start() {
@@ -37,6 +37,10 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (GameManager.instance.IsGameOver) {
+            return;
+        }
+
         // Fusion Mode 로직
         if (CheckFusionMode()) {
             MoveFusionSpaceship();
