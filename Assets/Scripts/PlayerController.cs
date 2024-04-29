@@ -14,12 +14,17 @@ public class Waypoint {
 public class PlayerController : MonoBehaviour {
     public Waypoint[] waypoints;
 
+    // Debug option
+    public int startWaypointIndex = -1;
+
     public float rotateDuration = 1.5f;
 
     // Fusion Mode
     public bool isFusionMode = false;
     public float activeFusionDistance = 0.2f;
     public float deactiveFusionDistance = 0.3f;
+    public AudioClip fusionActiveClip;
+    public AudioClip fusionDeactiveClip;
 
     // Charge Mode
     public bool isChargeMode = false;
@@ -28,11 +33,25 @@ public class PlayerController : MonoBehaviour {
     public int energy = 0;
     public int maxEnergy = 1000;
 
+    public AudioSource audioSource;
+    public AudioClip chargeStartClip;
+    public AudioClip chargeEndClip;
+
+    public AudioClip healClip;
+    public AudioClip energyClip;
+
     public float chargeTimer = 0f;
 
     // Start is called before the first frame update
     void Start() {
-        Move();
+        if (startWaypointIndex >= 0) {
+            transform.position = waypoints[startWaypointIndex].position;
+            transform.rotation = waypoints[startWaypointIndex + 1].direction;
+            Move(startWaypointIndex);
+        } else {
+            Move();
+        }
+
     }
 
     // Update is called once per frame
@@ -111,10 +130,14 @@ public class PlayerController : MonoBehaviour {
             leftSpaceship.SetActive(false);
             rightSpaceship.SetActive(false);
             fusionSpaceship.SetActive(true);
+
+            audioSource.PlayOneShot(fusionActiveClip);
         } else {
             leftSpaceship.SetActive(true);
             rightSpaceship.SetActive(true);
             fusionSpaceship.SetActive(false);
+
+            audioSource.PlayOneShot(fusionDeactiveClip);
         }
     }
 
@@ -140,7 +163,19 @@ public class PlayerController : MonoBehaviour {
         Tween.Rotation(transform, waypoints[index].direction, rotateDuration, 0f, Tween.EaseOut);
     }
 
+    public void PlayHealSound() {
+        audioSource.PlayOneShot(healClip);
+    }
+
+    public void PlayEnergySound() {
+        audioSource.PlayOneShot(energyClip);
+    }
+
     public void ChargeEnergy(int value) {
+        if (isChargeMode) {
+            return;
+        }
+
         energy += value;
 
         if (energy > maxEnergy) {
@@ -174,10 +209,21 @@ public class PlayerController : MonoBehaviour {
             leftSpaceship.weaponController = leftSpaceship.chargeWeaponController;
             rightSpaceship.weaponController = rightSpaceship.chargeWeaponController;
             fusionSpaceship.weaponController = fusionSpaceship.chargeWeaponController;
+
+            audioSource.PlayOneShot(chargeStartClip);
+            StartCoroutine(PlayChargeSource(chargeStartClip.length));
         } else {
             leftSpaceship.weaponController = leftSpaceship.mainWeaponController;
             rightSpaceship.weaponController = rightSpaceship.mainWeaponController;
             fusionSpaceship.weaponController = fusionSpaceship.mainWeaponController;
+
+            audioSource.Stop();
+            audioSource.PlayOneShot(chargeEndClip);
         }
+    }
+
+    IEnumerator PlayChargeSource(float time) {
+        yield return new WaitForSeconds(time);
+        audioSource.Play();
     }
 }

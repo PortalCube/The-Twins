@@ -13,6 +13,9 @@ public class SpaceshipFusionController : EntityController {
 
     public GameObject modelObject;
 
+    public AudioSource audioSource;
+    public AudioClip hitSound;
+
     public float invincibleTime = 1f;
     public float blinkInterval = 0.1f;
     bool isInvincible = false;
@@ -77,6 +80,11 @@ public class SpaceshipFusionController : EntityController {
     }
 
     public override void Hit(int damage) {
+        // 무적 상태면 무시
+        if (isInvincible) {
+            return;
+        }
+
         SpaceshipController leftSpaceship = GameManager.instance.leftSpaceship.GetComponent<SpaceshipController>();
         SpaceshipController rightSpaceship = GameManager.instance.rightSpaceship.GetComponent<SpaceshipController>();
 
@@ -87,6 +95,8 @@ public class SpaceshipFusionController : EntityController {
         if (!leftSpaceship.IsDead && !rightSpaceship.IsDead) {
             // 무적 발동
             SetInvincible(true);
+            Instantiate(hitEffect, transform.position, transform.rotation, transform.parent);
+            audioSource.PlayOneShot(hitSound);
         }
     }
 
@@ -112,14 +122,15 @@ public class SpaceshipFusionController : EntityController {
     }
 
     void OnTriggerEnter(Collider other) {
-        // 무적 상태면 무시
-        if (isInvincible) {
-            return;
-        }
-
-        if (other.CompareTag("Enemy") || other.CompareTag("Bullet") || other.CompareTag("Level")) {
-            // 적, 총알, 레벨 물체와 충돌하면 대미지를 입음
+        if (other.CompareTag("Enemy") || other.CompareTag("Level")) {
+            // 적, 레벨 물체와 충돌하면 대미지를 입음
             Hit(1);
+        } else if (other.CompareTag("Bullet")) {
+            BulletController bulletController = other.GetComponent<BulletController>();
+            if (bulletController.isEnemyBullet) {
+                // 적이 발사한 총알에 충돌하면 대미지를 입음
+                Hit(1);
+            }
         }
     }
 }

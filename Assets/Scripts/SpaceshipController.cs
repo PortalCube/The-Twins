@@ -11,8 +11,13 @@ public class SpaceshipController : EntityController {
 
     public GameObject hitEffect;
     public GameObject destroyEffect;
+    public GameObject reviveEffect;
 
     public GameObject modelObject;
+
+    public AudioSource audioSource;
+    public AudioClip hitSound;
+    public AudioClip destroySound;
 
     public float invincibleTime = 1f;
     public float blinkInterval = 0.1f;
@@ -62,17 +67,32 @@ public class SpaceshipController : EntityController {
         }
     }
 
+    public override void Revive(bool active = true) {
+        if (IsDead) {
+            Instantiate(reviveEffect, transform.position, transform.rotation, transform.parent);
+        }
+
+        base.Revive(active);
+    }
+
+
     public override void Hit(int damage) {
+        // 무적 상태면 무시
+        if (isInvincible) {
+            return;
+        }
+
         base.Hit(damage);
 
-        if (IsDead) {
-            // 사망 이펙트가 재생되므로 재생하지 않고 종료
+        if (IsDead || gameObject.activeSelf == false) {
+            // 사망했거나, fusionSpaceship이 활성화된 경우, 종료
             return;
         }
 
         // 무적 발동
         SetInvincible(true);
         Instantiate(hitEffect, transform.position, transform.rotation, transform.parent);
+        audioSource.PlayOneShot(hitSound);
     }
 
     public override void Die() {
@@ -80,6 +100,7 @@ public class SpaceshipController : EntityController {
         IsDead = true;
         Transform playerTransform = GameManager.instance.player.transform;
         Instantiate(destroyEffect, transform.position, transform.rotation, playerTransform);
+        audioSource.PlayOneShot(destroySound);
 
         SpaceshipController left = GameManager.instance.leftSpaceship.GetComponent<SpaceshipController>();
         SpaceshipController right = GameManager.instance.rightSpaceship.GetComponent<SpaceshipController>();
@@ -104,11 +125,6 @@ public class SpaceshipController : EntityController {
 
 
     void OnTriggerEnter(Collider other) {
-        // 무적 상태면 무시
-        if (isInvincible) {
-            return;
-        }
-
         if (other.CompareTag("Enemy") || other.CompareTag("Level")) {
             // 적, 레벨 물체와 충돌하면 대미지를 입음
             Hit(1);

@@ -7,6 +7,9 @@ public class WeaponController : MonoBehaviour {
     public GameObject bulletPrefab;
     public GameObject firePoint;
 
+    public AudioSource audioSource;
+    public AudioClip shootSound;
+
     public float fireRate = 0.1f;
     public float bulletSpeed = 10.0f;
     public int bulletDamage = 10;
@@ -21,6 +24,9 @@ public class WeaponController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
+        if (audioSource == null) {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     // Update is called once per frame
@@ -39,6 +45,8 @@ public class WeaponController : MonoBehaviour {
             return false;
         }
 
+        Transform playerTransform = GameManager.instance.player.transform;
+
         // Cooldown 시작
         time = 0f;
 
@@ -52,9 +60,9 @@ public class WeaponController : MonoBehaviour {
             float speed = bulletSpeed + Random.Range(-bulletSpeedSpread, bulletSpeedSpread);
 
             // 총알 생성
-            GameObject bulletObject = Instantiate(bulletPrefab, firePoint.transform.position, firePoint.transform.rotation);
+            GameObject bulletObject = Instantiate(bulletPrefab, firePoint.transform.position, firePoint.transform.rotation, playerTransform);
 
-            // 총알 회전
+            // bulletAngleSpread만큼 총알 회전
             bulletObject.transform.Rotate(x, y, z);
 
             // 총알 설정
@@ -63,6 +71,11 @@ public class WeaponController : MonoBehaviour {
             bulletController.damage = bulletDamage;
             bulletController.lifeTime = bulletLifeTime;
             bulletController.isEnemyBullet = isEnemyWeapon;
+        }
+
+        // 사운드 재생
+        if (audioSource != null && shootSound != null) {
+            audioSource.PlayOneShot(shootSound);
         }
 
         // 발사 성공

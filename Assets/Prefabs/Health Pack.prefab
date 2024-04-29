@@ -19614,7 +19614,7 @@ Transform:
   m_GameObject: {fileID: 6490465663679746352}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5853432856414951722}
@@ -24436,6 +24436,8 @@ MonoBehaviour:
   heal: 1
   energy: 0
   destroyEffect: {fileID: 273230568061671312, guid: 65d0614e6c859d84d90f2001a974ac09, type: 3}
+  healSound: {fileID: 8300000, guid: 2cb82883501014552993fdb5a327af24, type: 3}
+  energySound: {fileID: 8300000, guid: 3ae90d98e85794790ade60545c231868, type: 3}
 --- !u!1 &6763816204732580630
 GameObject:
   m_ObjectHideFlags: 0

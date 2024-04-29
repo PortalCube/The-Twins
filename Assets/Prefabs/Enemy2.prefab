@@ -28,7 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9026589105890591858}
   - {fileID: 1036914660445711124}
@@ -124,7 +124,7 @@ Transform:
   m_GameObject: {fileID: 1036914660625589989}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1036914659844935383}
@@ -143,14 +143,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36119c262168cb14b8cb958e710c2ca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 1000
+  maxHealth: 2500
   weaponController: {fileID: 1036914660625589984}
   trackPlayerRotation: 1
   trackPlayerPosition: 1
-  minFireRate: 1
-  maxFireRate: 1
+  minFireRate: 1.5
+  maxFireRate: 2
+  minEnergy: 80
+  maxEnergy: 150
   fireEffect: {fileID: 5560026878118828660, guid: 0cdba45ab5c90164789923346cff0392, type: 3}
   destroyEffect: {fileID: 358637981425055526, guid: 751dc36485d824c4990f0559e282d4ca, type: 3}
+  destroySound: {fileID: 8300000, guid: cb5cf0f59610f16478fbde191116e6e3, type: 3}
 --- !u!114 &1036914660625589984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,13 +168,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 2956450538829495136, guid: 9a6ca6dd3e2fb014aace82c8e9111044, type: 3}
   firePoint: {fileID: 1036914660445711127}
+  audioSource: {fileID: 0}
+  shootSound: {fileID: 0}
   fireRate: 0
-  bulletSpeed: 0.75
+  bulletSpeed: 0.7
   bulletDamage: 1
-  bulletLifeTime: 5
-  bulletCount: 1
-  bulletAngleSpread: 0
-  bulletSpeedSpread: 0
+  bulletLifeTime: 12
+  bulletCount: 3
+  bulletAngleSpread: 10
+  bulletSpeedSpread: 0.3
   isEnemyWeapon: 0
 --- !u!114 &1036914660625589987
 MonoBehaviour:

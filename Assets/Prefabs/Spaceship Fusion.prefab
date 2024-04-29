@@ -47,7 +47,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559837142643109010}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 9, y: 1.75, z: 6}
@@ -60,7 +60,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559837142643109010}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 2, y: 1.75, z: 4}
@@ -101,6 +101,8 @@ MonoBehaviour:
   fusionEffect: {fileID: 7996227468301461678, guid: 028f6d51c4550f747bf826b1c8dacc1c, type: 3}
   hitEffect: {fileID: 9131571270648820043, guid: fd3e86291584d5a4fbc7948caa003ca7, type: 3}
   modelObject: {fileID: 7784684050053131594}
+  audioSource: {fileID: 0}
+  hitSound: {fileID: 0}
   invincibleTime: 1
   blinkInterval: 0.1
 --- !u!114 &-7592582008607083561
@@ -117,13 +119,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 8028826215175499709, guid: 8f23137560f3f6644b3e5235f55a67da, type: 3}
   firePoint: {fileID: 6959128464614538690}
-  fireRate: 0.2
-  bulletSpeed: 10
-  bulletDamage: 200
-  bulletLifeTime: 5
-  bulletCount: 1
-  bulletAngleSpread: 1
-  bulletSpeedSpread: 0.5
+  audioSource: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: b02661b1983843f4a8e25854215c13f1, type: 3}
+  fireRate: 0.25
+  bulletSpeed: 15
+  bulletDamage: 250
+  bulletLifeTime: 8
+  bulletCount: 2
+  bulletAngleSpread: 3
+  bulletSpeedSpread: 1
   isEnemyWeapon: 0
 --- !u!114 &7915392603829363473
 MonoBehaviour:
@@ -139,13 +143,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 2607717210214390550, guid: cf3aac347816726489c29b3a63b7f00f, type: 3}
   firePoint: {fileID: 6959128464614538690}
-  fireRate: 0.05
-  bulletSpeed: 9
-  bulletDamage: 75
-  bulletLifeTime: 5
-  bulletCount: 4
-  bulletAngleSpread: 3
-  bulletSpeedSpread: 0.5
+  audioSource: {fileID: 0}
+  shootSound: {fileID: 0}
+  fireRate: 0.06
+  bulletSpeed: 12
+  bulletDamage: 200
+  bulletLifeTime: 3
+  bulletCount: 3
+  bulletAngleSpread: 5
+  bulletSpeedSpread: 1
   isEnemyWeapon: 0
 --- !u!1 &703091377631385018
 GameObject:

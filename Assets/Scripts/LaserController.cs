@@ -37,5 +37,18 @@ public class LaserController : MonoBehaviour {
             // sparkEffect 비활성화
             sparkEffect.SetActive(false);
         }
+
+        if (Physics.Raycast(transform.position, transform.forward, out hit, maxDistance)) {
+            if (hit.collider.CompareTag("Spaceship")) {
+                SpaceshipController controller = hit.collider.GetComponent<SpaceshipController>();
+                SpaceshipFusionController fusionController = hit.collider.GetComponent<SpaceshipFusionController>();
+
+                if (controller) {
+                    controller.Hit(1);
+                } else {
+                    fusionController.Hit(1);
+                }
+            }
+        }
     }
 }

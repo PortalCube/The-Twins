@@ -58,6 +58,18 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void Revive() {
+        SpaceshipController leftSpaceshipController = leftSpaceship.GetComponent<SpaceshipController>();
+        SpaceshipController rightSpaceshipController = rightSpaceship.GetComponent<SpaceshipController>();
+        PlayerController playerController = GameManager.instance.player.GetComponent<PlayerController>();
+
+        bool active = playerController.isFusionMode == false;
+
+        leftSpaceshipController.Revive(active);
+        rightSpaceshipController.Revive(active);
+
+    }
+
     public void UIUpdateLeftHealth() {
         int value = leftSpaceship.GetComponent<SpaceshipController>().Health;
 

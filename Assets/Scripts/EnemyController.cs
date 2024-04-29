@@ -19,9 +19,12 @@ public class EnemyController : EntityController {
     public GameObject fireEffect;
     public GameObject destroyEffect;
 
+    public AudioClip destroySound;
+
     Transform hitboxTransform;
     Animator animator;
     EntityAnimationController entityAnimationController;
+    AudioSource audioSource; // Ambient sound
 
     Quaternion lastRotation;
 
@@ -38,14 +41,17 @@ public class EnemyController : EntityController {
 
     protected override void Start() {
         base.Start();
-        animator.SetFloat("IdleOffset", Random.Range(0f, 0.5f));
 
         // 엔티티 애니메이터 시작
         entityAnimationController = GetComponent<EntityAnimationController>();
         entityAnimationController.StartAwakeAnimation();
         EnemyEnable();
 
-        hitboxTransform = transform.Find("Hitbox").transform;
+        hitboxTransform = transform.Find("Hitbox");
+
+        if (hitboxTransform == null) {
+            hitboxTransform = transform;
+        }
 
         SetFireRate();
 
@@ -61,11 +67,10 @@ public class EnemyController : EntityController {
 
         base.Update();
 
-        UpdateHitboxRotation();
-
         // trackPlayerRotation이 활성화 된 경우, hitboxTransform은 계속해서 target 방향으로 rotation 하도록 설정
         if (trackPlayerRotation) {
             GameObject target = FindNearstSpaceship();
+            UpdateHitboxRotation();
 
             // Spaceship이 존재하는 경우, Spaceship을 바라보도록 설정
             if (target) {
@@ -79,7 +84,10 @@ public class EnemyController : EntityController {
             }
         }
 
-        CheckFire();
+        if (Vector3.Distance(hitboxTransform.position, GameManager.instance.player.transform.position) < 6f) {
+            // 플레이어와의 거리가 10f 이하인 경우, 발사
+            CheckFire();
+        }
     }
 
     // hitboxTransform의 rotation이 Enemy transform의 회전에 영향을 받지 않도록 함
@@ -89,7 +97,10 @@ public class EnemyController : EntityController {
     }
 
     public void EnemyEnable() {
-        animator.SetTrigger("Spawn");
+        if (animator) {
+
+            animator.SetTrigger("Spawn");
+        }
 
         // trackPlayerPosition이 활성화 된 경우, parent를 player로 설정
         if (trackPlayerPosition) {
@@ -103,7 +114,22 @@ public class EnemyController : EntityController {
     public override void Die() {
         // Destroy 애니메이션 실행
         IsDead = true;
-        animator.SetTrigger("Destroy");
+
+        if (animator) {
+            animator.SetTrigger("Destroy");
+        } else {
+            Death();
+        }
+
+        if (audioSource) {
+            audioSource.Stop();
+        }
+
+        if (destroySound) {
+            AudioSource audioSource = GameManager.instance.player.GetComponent<AudioSource>();
+            audioSource.PlayOneShot(destroySound);
+        }
+
         entityAnimationController.StopAnimation();
 
         // energy를 랜덤하게 추가
@@ -112,6 +138,7 @@ public class EnemyController : EntityController {
 
         // 파괴 이펙트 생성
         Transform playerTransform = GameManager.instance.player.transform;
+
         Instantiate(destroyEffect, hitboxTransform.position, hitboxTransform.rotation, playerTransform);
     }
 
@@ -174,6 +201,10 @@ public class EnemyController : EntityController {
             // 비활성화된 Spaceship은 제외
             if (spaceship.activeSelf == false) {
                 continue;
+            }
+
+            if (hitboxTransform == null) {
+                Debug.LogError("Hitbox Transform is null, " + gameObject.name);
             }
 
             float distance = Vector3.Distance(hitboxTransform.position, spaceship.transform.position);

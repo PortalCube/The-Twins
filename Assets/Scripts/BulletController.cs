@@ -25,7 +25,21 @@ public class BulletController : MonoBehaviour {
 
         time += Time.deltaTime;
 
-        transform.position += transform.forward * speed * Time.deltaTime;
+        Vector3 newPosition = transform.position + transform.forward * speed * Time.deltaTime;
+
+        // Raycast를 이용해서 충돌 검사
+        if (isEnemyBullet == false) {
+            RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, speed * Time.deltaTime);
+            foreach (var hit in hits) {
+                // 충돌한 대상이 Enemy인 경우
+                if (hit.collider.CompareTag("Enemy")) {
+                    // 제대로 충돌하도록 위치 조정
+                    newPosition = hit.point;
+                }
+            }
+        }
+
+        transform.position = newPosition;
 
         if (time > lifeTime) {
             Destroy(gameObject);
@@ -52,8 +66,12 @@ public class BulletController : MonoBehaviour {
             }
         }
 
-        if (other.CompareTag("Player") && isEnemyBullet == false) {
+        if (other.CompareTag("Spaceship") && isEnemyBullet == false) {
             // 플레이어의 총알이 플레이어에게 충돌한 경우, 무시
+            return;
+        }
+
+        if (other.CompareTag("Player")) {
             return;
         }
 

@@ -37,6 +37,14 @@ public class EntityController : MonoBehaviour {
         }
     }
 
+    public virtual void Revive(bool active = true) {
+        Health = maxHealth;
+        IsDead = false;
+        if (active) {
+            gameObject.SetActive(true);
+        }
+    }
+
     public virtual void Hit(int damage) {
         if (IsDead) {
             return;

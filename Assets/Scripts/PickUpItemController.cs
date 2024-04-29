@@ -20,14 +20,17 @@ public class PickUpItemController : MonoBehaviour {
 
     void OnTriggerEnter(Collider other) {
         if (other.gameObject.tag == "Spaceship") {
-            EntityController entity = other.gameObject.GetComponent<EntityController>();
+
+            PlayerController playerController = GameManager.instance.player.GetComponent<PlayerController>();
 
             if (heal) {
-                entity.Heal(entity.maxHealth);
+                GameManager.instance.Revive();
+                playerController.PlayHealSound();
             }
 
             if (energy > 0) {
                 GameManager.instance.player.GetComponent<PlayerController>().ChargeEnergy(energy);
+                playerController.PlayEnergySound();
             }
 
             Instantiate(destroyEffect, transform.position, Quaternion.identity);
